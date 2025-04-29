@@ -1,0 +1,19 @@
+{
+  "name": "tow-track",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --workspace=@tow-track/server\" \"npm run dev --workspace=@tow-track/telegram-bot\"",
+    "deploy": "npm run deploy --workspace=@tow-track/server && npm run deploy --workspace=@tow-track/telegram-bot"
+  },
+  "workspaces": [
+    "apps/tow-track-server",
+    "apps/tow-track-telegram-bot"
+  ],
+  "author": "Dosmukhamed",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
