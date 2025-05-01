@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 // Партнёры
 export const partners = sqliteTable('partners', {
@@ -44,22 +44,36 @@ const OfferStatus = [
   'rejected'   // Клиент отказал
 ] as const;
 
-export const offers = sqliteTable('offers', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  order_id: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
-  partner_id: integer('partner_id').notNull().references(() => partners.id, { onDelete: 'cascade' }),
-  price: real('price').notNull(),
-  status: text('status').$type<typeof OfferStatus[number]>().notNull().default('pending'),
-  created_at: text('created_at').default('CURRENT_TIMESTAMP'),
-});
+export const offers = sqliteTable(
+  'offers',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    order_id: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+    partner_id: integer('partner_id').notNull().references(() => partners.id, { onDelete: 'cascade' }),
+    price: real('price').notNull(),
+    status: text('status').$type<typeof OfferStatus[number]>().notNull().default('pending'),
+    created_at: text('created_at').default('CURRENT_TIMESTAMP'),
+  },
+  (offers) => ({
+    uniqueOrderPartner: uniqueIndex('unique_order_partner').on(offers.order_id, offers.partner_id),
+  })
+);
+
 
 // Чаты
-export const chats = sqliteTable('chats', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  order_id: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
-  partner_id: integer('partner_id').notNull().references(() => partners.id, { onDelete: 'cascade' }),
-  created_at: text('created_at').default('CURRENT_TIMESTAMP')
-});
+export const chats = sqliteTable(
+  'chats',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    order_id: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
+    partner_id: integer('partner_id').notNull().references(() => partners.id, { onDelete: 'cascade' }),
+    created_at: text('created_at').default('CURRENT_TIMESTAMP'),
+  },
+  (chats) => ({
+    // 👇 Добавляем уникальный индекс на пару (order_id, partner_id)
+    uniqueChat: uniqueIndex('unique_order_partner_chat').on(chats.order_id, chats.partner_id),
+  })
+);
 
 // Сообщения в чате
 export const messages = sqliteTable('messages', {
