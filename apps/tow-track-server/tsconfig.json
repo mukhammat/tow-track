@@ -29,6 +29,7 @@
 		"paths": {
 			"@db": ["./common/db"],
 			"@middleware": ["./common/middleware"],
+			"@exceptions": ["./common/exceptions"],
 		}
 	},
 	"exclude": ["node_modules", "dist", "tests"],

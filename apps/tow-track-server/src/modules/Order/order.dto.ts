@@ -8,9 +8,6 @@ export type CreateOrderDto = {
   phone: string;
   client_telegram_id: number;
   vehicle_info: string;
-  partner_id?: number | null;
-  price?: number | null;
-  status?: OrderStatus;
 };
 
 export type GetOrderDto = {

@@ -19,12 +19,12 @@ export class OrderController implements IOrderController {
     private routers() {
         this.router.post("/create", zValidator("json", CreateOrderDtoSchema), this.createOrder.bind(this));
         this.router.get("/all", this.getAll.bind(this));
-        this.router.get("/set-partner/:orderId", checkAuth, this.setPartner.bind(this))
+        this.router.get("/assign-partner/:orderId", checkAuth, this.assignPartnerToOrder.bind(this))
     }
 
     private async createOrder(c: Context) {
         const data = await c.req.json() as unknown as CreateOrderDto;
-        const isCreated = await this.orderService.createOrder(c.env.DB, data );
+        const isCreated = await this.orderService.create(c.env.DB, data );
         return c.json({ success: isCreated });
     }
 
@@ -34,13 +34,13 @@ export class OrderController implements IOrderController {
         return c.json({ success: true , data });
     }
 
-    private async setPartner(c: Context) {
+    private async assignPartnerToOrder(c: Context) {
         const { orderId } = c.req.param();
         if (!orderId || isNaN(Number(orderId))) {
             return c.json({ success: false, message: "Invalid order ID" }, 400);
         }
         const partner = await c.get("partner");
-        const isUpdated = await this.orderService.setPartner(c.env.DB, Number(orderId),partner.id);
+        const isUpdated = await this.orderService.assignPartnerToOrder(c.env.DB, Number(orderId),partner.id);
         return c.json({ success: isUpdated });
     }
 }
