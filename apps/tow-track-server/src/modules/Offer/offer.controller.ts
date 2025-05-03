@@ -5,21 +5,31 @@ export interface IOfferController {
     router: Hono;
 }
 
-class OfferController {
-    public readonly router;
-    constructor(private orderService: IOfferService) {
+export class OfferController {
+    public readonly router: Hono;
+    constructor(private offerService: IOfferService) {
         this.router = new Hono();
         this.routers();
     }
 
     private routers() {
+        this.router.get("/accept/:offerId", this.acceptOfferThenOrder.bind(this));
+        this.router.post("/create", this.createOffer.bind(this));
     }
 
-    async acceptOfferAndOrder(c: Context) {
+    async acceptOfferThenOrder(c: Context) {
         const {offerId} = c.req.param();
 
-        await this.orderService.acceptOffer(c.env.DB, Number(offerId));
+        const data = await this.offerService.acceptOffer(c.env.DB, Number(offerId));
 
-        return c.json({}, 200);
+        return c.json({"data": data }, 200);
+    }
+
+    async createOffer(c: Context) {
+        const data = await c.req.json();
+
+        await this.offerService.create(c.env.DB, data);
+
+        return c.json({ "message": "Offer is created" }, 201);
     }
 }

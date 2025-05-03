@@ -1,6 +1,7 @@
 import { PartnerService, PartnerController } from "modules/Partner";
 import {OrderController, OrderService, registerOrderEvents} from "./modules/Order";
 import { AuthController, AuthService } from "modules/Auth";
+import { OfferController, OfferService } from "modules/Offer";
 
 export default {
     createOrder() {
@@ -15,5 +16,9 @@ export default {
     createPartner() {
         const partnerSrv = new PartnerService();
         return new PartnerController(partnerSrv);
+    },
+    createOffer() {
+        const offerSrv = new OfferService();
+        return new OfferController(offerSrv);
     }
 }
