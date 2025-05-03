@@ -1,24 +1,20 @@
-import { EventEmitter } from "events";
+type EventHandler = (...args: any[]) => void;
 
-export interface IEventBus {
-    emit<T>(event: string, payload: T): void;
-    on<T>(event: string, handler: (payload: T) => void): void;
+class SimpleEventBus {
+  private listeners: Record<string, EventHandler[]> = {};
+
+  on(event: string, handler: EventHandler) {
+    this.listeners[event] ||= [];
+    this.listeners[event].push(handler);
+  }
+
+  emit(event: string, ...args: any[]) {
+    (this.listeners[event] || []).forEach((handler) => handler(...args));
+  }
+
+  off(event: string, handler: EventHandler) {
+    this.listeners[event] = (this.listeners[event] || []).filter(h => h !== handler);
+  }
 }
 
-class LocalEventBus implements IEventBus {
-    private eventEmitter: EventEmitter;
-
-    constructor() {
-        this.eventEmitter = new EventEmitter();
-    }
-
-    emit<T>(event: string, payload: T): void {
-        this.eventEmitter.emit(event, payload);
-    }
-
-    on<T>(event: string, handler: (payload: T) => void): void {
-        this.eventEmitter.on(event, handler);
-    }
-}
-
-export const eventBus: IEventBus = new LocalEventBus();
+export const eventBus = new SimpleEventBus();

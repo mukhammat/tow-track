@@ -6,13 +6,11 @@ import { eventBus } from "@libs";
 
 export interface IOrderService {
     create(client: D1Database, data: CreateOrderDto): Promise<void>;
-    //assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number):Promise<unknown>;
     getAll(d1: D1Database): Promise<unknown>;
 }
 
 export class OrderService implements IOrderService {
     constructor() {
-        this.listenToEvents();
     }
 
     public async create(d1: D1Database, data: CreateOrderDto) {
@@ -20,17 +18,6 @@ export class OrderService implements IOrderService {
         const db = drizzleClient(d1);
         await db.insert(orders).values(data);
         return;
-    }
-
-    private listenToEvents() {
-        eventBus.on("offer.accepted", async ({orderId, partnerId, db})=> {
-            try {
-                console.log("[OrderService] received event: offer.accepted");
-                await this.assignPartnerToOrder(db, orderId, partnerId);
-            } catch (error) {
-                console.log("Error assigning partner:", error);
-            }
-        })
     }
 
     private async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
