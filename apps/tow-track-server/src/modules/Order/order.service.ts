@@ -2,15 +2,18 @@ import { eq } from "drizzle-orm";
 import { drizzleClient, orders, partners } from "@db"
 import { CreateOrderDto, GetOrderDto, OrderStatus } from "."
 import { NotFoundException, NotAvailableException } from "@exceptions";
+import { eventBus } from "@libs";
 
 export interface IOrderService {
     create(client: D1Database, data: CreateOrderDto): Promise<void>;
-    assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number):Promise<unknown>;
+    //assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number):Promise<unknown>;
     getAll(d1: D1Database): Promise<unknown>;
 }
 
 export class OrderService implements IOrderService {
-    constructor() {}
+    constructor() {
+        this.listenToEvents();
+    }
 
     public async create(d1: D1Database, data: CreateOrderDto) {
         console.log("Creating order in the database...");
@@ -19,7 +22,18 @@ export class OrderService implements IOrderService {
         return;
     }
 
-    public async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
+    private listenToEvents() {
+        eventBus.on("offer.accepted", async ({orderId, partnerId, db})=> {
+            try {
+                console.log("[OrderService] received event: offer.accepted");
+                await this.assignPartnerToOrder(db, orderId, partnerId);
+            } catch (error) {
+                console.log("Error assigning partner:", error);
+            }
+        })
+    }
+
+    private async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
         console.log("Assign partner to order...");
         const db = drizzleClient(d1);
         const order = await this.getById(db, order_id);
@@ -87,8 +101,8 @@ export class OrderService implements IOrderService {
         const order = await db
         .update(orders)
         .set(data)
-        .where(eq(orders.id,  order_id));
+        .where(eq(orders.id,  order_id)).returning().get();
 
-        return order.success;
+        return order;
     }
 }
