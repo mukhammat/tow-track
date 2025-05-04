@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { drizzleClient, orders, partners } from "@db"
 import { CreateOrderDto, GetOrderDto, OrderStatus } from "."
 import { NotFoundException, NotAvailableException } from "@exceptions";
-import { eventBus } from "@libs";
 
 export interface IOrderService {
     create(client: D1Database, data: CreateOrderDto): Promise<void>;
@@ -51,7 +50,7 @@ export class OrderService implements IOrderService {
             where: eq(orders.status, "searching"),
         });
 
-        if (!order) {
+        if (!order.length) {
             throw new NotFoundException("Order");
         }
 
@@ -71,11 +70,11 @@ export class OrderService implements IOrderService {
     }
     
     private async getManyByPartnerId(db: ReturnType<typeof drizzleClient>, partner_id: number) {
-        const results = db.query.orders.findMany({
+        const results = await db.query.orders.findMany({
             where: eq(orders.partner_id, partner_id),
         });
 
-        if (!results) {
+        if (!results.length) {
             throw new NotFoundException("Order");
         }
 
