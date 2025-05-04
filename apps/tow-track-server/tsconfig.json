@@ -31,6 +31,7 @@
 			"@middleware": ["./common/middleware"],
 			"@exceptions": ["./common/exceptions"],
 			"@libs": ["./common/libs"],
+			"@utils": ["./common/utils"]
 		}
 	},
 	"exclude": ["node_modules", "dist", "tests"],
