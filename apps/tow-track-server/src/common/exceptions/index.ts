@@ -1,3 +1,3 @@
-export * from "./not-available.exception";
-export * from "./not-found.exception";
-export * from "./bad-request.exception";
+export * from "./not-available";
+export * from "./not-found";
+export * from "./bad-request";
