@@ -65,14 +65,9 @@ export const chats = sqliteTable(
   'chats',
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    order_id: integer('order_id').notNull().references(() => orders.id, { onDelete: 'cascade' }),
-    partner_id: integer('partner_id').notNull().references(() => partners.id, { onDelete: 'cascade' }),
+    offer_id: integer('offer_id').notNull().unique().references(() => offers.id, { onDelete: 'cascade' }),
     created_at: text('created_at').default('CURRENT_TIMESTAMP'),
   },
-  (chats) => ({
-    // 👇 Добавляем уникальный индекс на пару (order_id, partner_id)
-    uniqueChat: uniqueIndex('unique_order_partner_chat').on(chats.order_id, chats.partner_id),
-  })
 );
 
 // Сообщения в чате
@@ -80,5 +75,6 @@ export const messages = sqliteTable('messages', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   chat_id: integer('chat_id').notNull().references(() => chats.id, { onDelete: 'cascade' }),
   message: text('message').notNull(),
-  sent_at: text('sent_at').default('CURRENT_TIMESTAMP')
+  sender: text('sender').notNull(),
+  sent_at: text('sent_at').default('CURRENT_TIMESTAMP'),
 });

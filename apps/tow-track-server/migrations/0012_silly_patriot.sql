@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `chats_offer_id_unique` ON `chats` (`offer_id`);
