@@ -1,6 +1,7 @@
-import { Context, Hono } from "hono"
-import { zValidator } from '@hono/zod-validator'
-import { IAuthService, RegisterDto, RegisterDtoSchema } from "."
+import { Context, Hono } from "hono";
+import { zValidator } from '@hono/zod-validator';
+import { IAuthService, RegisterDto, RegisterDtoSchema } from ".";
+import { ICustomResponse } from "@utils";
 
 export interface IAuthController {
     readonly router: Hono;
@@ -8,7 +9,10 @@ export interface IAuthController {
 
 export class AuthController {
     public readonly router;
-    constructor(private authService: IAuthService) {
+    constructor(
+        private authService: IAuthService,
+        private customResponse: ICustomResponse,
+    ) {
         this.router = new Hono();
         this.routers();
     }
@@ -24,7 +28,10 @@ export class AuthController {
         console.log("telegram_id", telegram_id);
         const auth = await this.authService.login(c.env.DB, telegram_id);
         if(!auth)return c.json({"success": false, "message": "User not found"}, 404);
-        return c.json({"success": true, "telegram_id": auth}, 200);
+
+        return c.json(...this.customResponse.success({status: 200, data: {
+            "telegram_id": auth
+        }}));
     }
 
     private async register(c: Context) {
@@ -33,6 +40,7 @@ export class AuthController {
         console.log("register data", data);
         const result = await this.authService.register(c.env.DB, data);
         if(!result) return c.json({ success: false, message: "User already exists" }, 409);
-        return c.json({ success: result }, 201);
+
+        return c.json(...this.customResponse.success({status: 201, data: result}))
     }
 }

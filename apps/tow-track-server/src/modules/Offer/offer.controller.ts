@@ -1,7 +1,7 @@
 import { Context, Hono } from "hono";
 import { zValidator } from '@hono/zod-validator'
 import { CreateOfferDtoSchema, IOfferService } from ".";
-import { d } from "drizzle-kit/index-BAUrj6Ib";
+import { ICustomResponse } from "@utils";
 
 export interface IOfferController {
     router: Hono;
@@ -9,7 +9,10 @@ export interface IOfferController {
 
 export class OfferController {
     public readonly router: Hono;
-    constructor(private offerService: IOfferService) {
+    constructor(
+        private offerService: IOfferService,
+        private customResponse: ICustomResponse
+    ) {
         this.router = new Hono();
         this.routers();
     }
@@ -31,15 +34,15 @@ export class OfferController {
 
         console.log("Datas:", data);
 
-        return c.json({"message": "Offer then order accepted!" }, 200);
-    }
+        return c.json(...this.customResponse.success({ message: "Offer then order accepted!" }));
+    } 
 
     async createOffer(c: Context) {
         const data = await c.req.json();
 
         await this.offerService.createOffer(c.env.DB, data);
 
-        return c.json({ "message": "Offer is created" }, 201);
+        return c.json(...this.customResponse.success({ message: "Offer created!", status: 201 }));
     }
 
     async getOffersByOrderId(c: Context) {
@@ -48,8 +51,8 @@ export class OfferController {
         if(isNaN(Number(orderId))) {
             return c.json({"message": "orderId is unvalid!" }, 401);
         }
-        const results = await this.offerService.getPendingOffersByOrderId(c.env.DB, Number(orderId));
+        const data = await this.offerService.getPendingOffersByOrderId(c.env.DB, Number(orderId));
 
-        return c.json({"data": results}, 200);
+        return c.json(...this.customResponse.success({ data, status: 200 }));
     }
 }
