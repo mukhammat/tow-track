@@ -8,6 +8,7 @@ export interface IOrderService {
     getAll(d1: D1Database): Promise<unknown>;
     cancelOrder(d1: D1Database, order_id: number): Promise<number>;
     completeOrder(d1: D1Database, order_id: number): Promise<number>;
+    getById(d1: D1Database, order_id: number): Promise<GetOrderDto>;
 }
 
 export class OrderService implements IOrderService {
@@ -23,7 +24,7 @@ export class OrderService implements IOrderService {
     public async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
         console.log("Assign partner to order...");
         const db = drizzleClient(d1);
-        const order = await this.getById(db, order_id);
+        const order = await this.getById(d1, order_id);
     
         if (!["negotiating", "searching"].includes(order.status)) {
             throw new NotAvailableException({entity: "Order", id: order.id});
@@ -58,7 +59,9 @@ export class OrderService implements IOrderService {
         return order;
     }
 
-    private async getById(db: ReturnType<typeof drizzleClient>, order_id: number) {
+    public async getById(d1: D1Database, order_id: number) {
+        const db = drizzleClient(d1);
+
         const order = await db.query.orders.findFirst({
             where: eq(orders.id, order_id),
         });
@@ -96,7 +99,7 @@ export class OrderService implements IOrderService {
     public async cancelOrder(d1: D1Database, order_id: number) {
         console.log("Cancel order...");
         const db = drizzleClient(d1);
-        const order = await this.getById(db, order_id);
+        const order = await this.getById(d1, order_id);
     
         if (order.status === "canceled") {
             throw new NotAvailableException({entity: "Order", id: order.id});
@@ -114,7 +117,7 @@ export class OrderService implements IOrderService {
     public async completeOrder(d1: D1Database, order_id: number) {
         console.log("Complete order...");
         const db = drizzleClient(d1);
-        const order = await this.getById(db, order_id);
+        const order = await this.getById(d1, order_id);
     
         if (order.status === "delivered") {
             throw new NotAvailableException({entity: "Order", id: order.id});

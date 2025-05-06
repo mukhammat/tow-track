@@ -10,21 +10,21 @@ export type CreateOrderDto = {
   vehicle_info: string;
 };
 
-export type GetOrderDto = {
-    id: number;
-    phone: string;
-    client_telegram_id: number;
-    vehicle_info: string;
-    created_at: string;
-    from: string;
-    to: string;
-    intercity?: 0 | 1;
-    location_url?: string;
-    partner_id?: number | null;
-    price?: number | null;
-    status: OrderStatus;
-    updated_at: string;
-};
+export type GetOrderDto =  {
+  id: number;
+  phone: string;
+  vehicle_info: string;
+  created_at: string;
+  from: string;
+  to: string;
+  intercity: number;
+  location_url: string;
+  client_telegram_id: number;
+  partner_id: number;
+  price: number;
+  status: OrderStatus;
+  updated_at: string;
+}
 
 
 import { z } from 'zod';

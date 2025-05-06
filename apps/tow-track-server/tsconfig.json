@@ -31,7 +31,8 @@
 			"@middleware": ["./common/middleware"],
 			"@exceptions": ["./common/exceptions"],
 			"@libs": ["./common/libs"],
-			"@utils": ["./common/utils"]
+			"@utils": ["./common/utils"],
+			"@dto": ["./common/dto"],
 		}
 	},
 	"exclude": ["node_modules", "dist", "tests"],
