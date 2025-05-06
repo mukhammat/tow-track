@@ -18,7 +18,7 @@ export class OrderService implements IOrderService {
         return (await db.insert(orders).values(data).returning().get()).id;
     }
 
-    async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
+    public async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
         console.log("Assign partner to order...");
         const db = drizzleClient(d1);
         const order = await this.getById(db, order_id);

@@ -16,8 +16,6 @@ export class ChatController {
     private routers() {
         this.router.post("/send", this.sendMessage.bind(this));
         this.router.post("/get", this.getMessages.bind(this));
-        // this.router.post("/delete", this.deleteMessage.bind(this));
-        // this.router.post("/update", this.updateMessage.bind(this));
     }
 
     private async sendMessage(c: Context) {
@@ -51,38 +49,4 @@ export class ChatController {
             status: 201
         }}))
     }
-
-    // private async deleteMessage(c: Context) {
-    //     const { messageId } = await c.req.json();
-
-    //     if(isNaN(Number(messageId))) {
-    //         return c.json({"message": "messageId is unvalid!" }, 401);
-    //     }
-
-    //     const result = await this.chatService.deleteMessage(c.env.DB, messageId);
-
-    //     return c.json(...this.customResponse.success({data: {
-    //         result,
-    //         messages: "Message deleted!",
-    //         status: 201
-    //     }}))
-    // }
-
-    // private async updateMessage(c: Context) {
-    //     const { messageId, message } = await c.req.json();
-
-    //     if(isNaN(Number(messageId))) {
-    //         return c.json({"message": "messageId is unvalid!" }, 401);
-    //     }
-
-    //     const result = await this.chatService.updateMessage(c.env.DB, messageId, message);
-
-    //     return c.json(...this.customResponse.success({data: {
-    //         result,
-    //         messages: "Message updated!",
-    //         status: 201
-    //     }}));
-    // }
-
-
 }
