@@ -75,6 +75,6 @@ export const messages = sqliteTable('messages', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   chat_id: integer('chat_id').notNull().references(() => chats.id, { onDelete: 'cascade' }),
   message: text('message').notNull(),
-  sender: text('sender').notNull(),
+  is_client: integer('is_client').notNull().default(0),
   sent_at: text('sent_at').default('CURRENT_TIMESTAMP'),
 });

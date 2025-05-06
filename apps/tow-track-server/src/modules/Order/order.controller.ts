@@ -24,8 +24,8 @@ export class OrderController implements IOrderController {
 
     private async createOrder(c: Context) {
         const data = await c.req.json() as unknown as CreateOrderDto;
-        await this.orderService.create(c.env.DB, data );
-        return c.json(...this.customResponse.success({ message: "Order is created", status: 201 }));
+        const orderId = await this.orderService.create(c.env.DB, data );
+        return c.json(...this.customResponse.success({ message: "Order is created", status: 201, data: { orderId } }));
     }
 
     private async getAll(c: Context) {

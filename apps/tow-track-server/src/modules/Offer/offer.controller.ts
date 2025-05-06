@@ -40,9 +40,9 @@ export class OfferController {
     async createOffer(c: Context) {
         const data = await c.req.json();
 
-        await this.offerService.createOffer(c.env.DB, data);
+        const offerId = await this.offerService.createOffer(c.env.DB, data);
 
-        return c.json(...this.customResponse.success({ message: "Offer created!", status: 201 }));
+        return c.json(...this.customResponse.success({ message: "Offer created!", status: 201, data: { offerId } }));
     }
 
     async getOffersByOrderId(c: Context) {

@@ -5,7 +5,7 @@ import { BadRequestException, NotFoundException } from "@exceptions";
 import { eventBus } from "@libs";
 
 export interface IOfferService {
-  createOffer(d1: D1Database, data: CreateOfferDto):Promise<void>;
+  createOffer(d1: D1Database, data: CreateOfferDto):Promise<number>;
   getAll(d1: D1Database): Promise<GetOfferDto[]>;
   acceptOffer( d1: D1Database, offerId: number): Promise<GetOfferDto>;
   getPendingOffersByOrderId(d1: D1Database, orderId: number): Promise<GetOfferDto[]>;
@@ -16,8 +16,7 @@ export class OfferService implements IOfferService {
 
   public async createOffer(d1: D1Database, data: CreateOfferDto) {
       const db = drizzleClient(d1);
-      await db.insert(offers).values(data).returning().get();
-      return;
+      return (await db.insert(offers).values(data).returning().get()).id;
   }
 
   public async getAll(d1: D1Database) {

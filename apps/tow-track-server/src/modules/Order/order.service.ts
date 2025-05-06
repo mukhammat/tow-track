@@ -4,7 +4,7 @@ import { CreateOrderDto, GetOrderDto, OrderStatus } from "."
 import { NotFoundException, NotAvailableException } from "@exceptions";
 
 export interface IOrderService {
-    create(client: D1Database, data: CreateOrderDto): Promise<void>;
+    create(client: D1Database, data: CreateOrderDto): Promise<number>;
     getAll(d1: D1Database): Promise<unknown>;
 }
 
@@ -15,8 +15,7 @@ export class OrderService implements IOrderService {
     public async create(d1: D1Database, data: CreateOrderDto) {
         console.log("Creating order in the database...");
         const db = drizzleClient(d1);
-        await db.insert(orders).values(data);
-        return;
+        return (await db.insert(orders).values(data).returning().get()).id;
     }
 
     async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {

@@ -3,7 +3,7 @@ import {OrderController, OrderService, registerOrderEvents} from "./modules/Orde
 import { AuthController, AuthService } from "modules/Auth";
 import { OfferController, OfferService } from "modules/Offer";
 import { CustomResponse } from "@utils";
-import { ChatController, ChatService } from "modules/Chat";
+import { ChatController, ChatService, registerChatEvents } from "modules/Chat";
 
 export default {
     createOrder() {
@@ -29,6 +29,7 @@ export default {
     createChat() {
         const chatSrv = new ChatService();
         const customResponce = new CustomResponse();
+        registerChatEvents(chatSrv);
         return new ChatController(chatSrv, customResponce);
     }
 }
