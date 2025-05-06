@@ -6,6 +6,8 @@ import { NotFoundException, NotAvailableException } from "@exceptions";
 export interface IOrderService {
     createOrder(client: D1Database, data: CreateOrderDto): Promise<number>;
     getAll(d1: D1Database): Promise<unknown>;
+    cancelOrder(d1: D1Database, order_id: number): Promise<number>;
+    completeOrder(d1: D1Database, order_id: number): Promise<number>;
 }
 
 export class OrderService implements IOrderService {
@@ -37,7 +39,7 @@ export class OrderService implements IOrderService {
             throw new NotAvailableException({ message: `Partner with id ${partner_id} already has active order` });
         }
     
-        const updatedOrder = await this.update(db, order_id, { partner_id, status: "negotiating" });
+        const updatedOrder = await this.updateOrder(db, order_id, { partner_id, status: "negotiating" });
     
         return updatedOrder;
     }
@@ -80,7 +82,7 @@ export class OrderService implements IOrderService {
         return results;
     }
 
-    private async update(db:  ReturnType<typeof drizzleClient>, order_id: number, data: unknown) {
+    private async updateOrder(db:  ReturnType<typeof drizzleClient>, order_id: number, data: unknown) {
         console.log("Update order...");
 
         const order = await db
@@ -89,5 +91,42 @@ export class OrderService implements IOrderService {
         .where(eq(orders.id,  order_id)).returning().get();
 
         return order;
+    }
+
+    public async cancelOrder(d1: D1Database, order_id: number) {
+        console.log("Cancel order...");
+        const db = drizzleClient(d1);
+        const order = await this.getById(db, order_id);
+    
+        if (order.status === "canceled") {
+            throw new NotAvailableException({entity: "Order", id: order.id});
+        }
+
+        if(["delivered", "waiting", "loading", "canceled"].includes(order.status)) {
+            throw new NotAvailableException({entity: "Order", id: order.id});
+        }
+    
+        const updatedOrder = await this.updateOrder(db, order_id, { status: "canceled" });
+    
+        return updatedOrder.id;
+    }
+
+    public async completeOrder(d1: D1Database, order_id: number) {
+        console.log("Complete order...");
+        const db = drizzleClient(d1);
+        const order = await this.getById(db, order_id);
+    
+        if (order.status === "delivered") {
+            throw new NotAvailableException({entity: "Order", id: order.id});
+        }
+
+            
+        if (["searching", "negotiating", "canceled", "delivered"].includes(order.status)) {
+            throw new NotAvailableException({entity: "Order", id: order.id});
+        }
+    
+        const updatedOrder = await this.updateOrder(db, order_id, { status: "delivered" });
+    
+        return updatedOrder.id;
     }
 }

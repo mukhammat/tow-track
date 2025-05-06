@@ -20,6 +20,8 @@ export class OrderController implements IOrderController {
     private routers() {
         this.router.post("/create", zValidator("json", CreateOrderDtoSchema), this.createOrder.bind(this));
         this.router.get("/all", this.getAll.bind(this));
+        this.router.post("/cancel", this.cancelOrder.bind(this));
+        this.router.post("/complete", this.completeOrder.bind(this));
     }
 
     private async createOrder(c: Context) {
@@ -32,5 +34,27 @@ export class OrderController implements IOrderController {
         const data = await this.orderService.getAll(c.env.DB);
         console.log("All Data", data);
         return c.json(...this.customResponse.success({ data }));
+    }
+
+    private async cancelOrder(c: Context) {
+        const { orderId } = c.req.param();
+
+        if(isNaN(Number(orderId))) {
+            return c.json({"message": "chatId is unvalid!" }, 401);
+        }
+
+        const result = await this.orderService.cancelOrder(c.env.DB, Number(orderId));
+        return c.json(...this.customResponse.success({ message: "Order is canceled", status: 201, data: { result } }));
+    }
+
+    private async completeOrder(c: Context) {
+        const { orderId } = c.req.param();
+
+        if(isNaN(Number(orderId))) {
+            return c.json({"message": "chatId is unvalid!" }, 401);
+        }
+
+        const result = await this.orderService.completeOrder(c.env.DB, Number(orderId));
+        return c.json(...this.customResponse.success({ message: "Order is completed", status: 201, data: { result } }));
     }
 }
