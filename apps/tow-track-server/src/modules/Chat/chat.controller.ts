@@ -15,7 +15,7 @@ export class ChatController {
 
     private routers() {
         this.router.post("/send", this.sendMessage.bind(this));
-        this.router.post("/get", this.getMessages.bind(this));
+        this.router.get("/all/:chatId", this.getMessages.bind(this));
     }
 
     private async sendMessage(c: Context) {
@@ -35,13 +35,13 @@ export class ChatController {
     }
 
     private async getMessages(c: Context) {
-        const { chatId } = await c.req.json();
+        const { chatId } = c.req.param();
 
         if(isNaN(Number(chatId))) {
             return c.json({"message": "chatId is unvalid!" }, 401);
         }
 
-        const result = await this.chatService.getMessages(c.env.DB, chatId);
+        const result = await this.chatService.getMessages(c.env.DB, Number(chatId));
 
         return c.json(...this.customResponse.success({data: {
             result,

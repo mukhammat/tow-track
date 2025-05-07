@@ -18,7 +18,7 @@ export class OfferController {
     }
 
     private routers() {
-        this.router.get("/accept/:offerId", this.acceptOfferThenOrder.bind(this));
+        this.router.patch("/accept/:offerId", this.acceptOfferThenOrder.bind(this));
         this.router.post("/create", zValidator("json", CreateOfferDtoSchema), this.createOffer.bind(this));
         this.router.get("/all/:orderId", this.getOffersByOrderId.bind(this));
     }
