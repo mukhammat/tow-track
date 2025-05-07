@@ -22,8 +22,8 @@ export class OrderController implements IOrderController {
     private routers() {
         this.router.post("/create", zValidator("json", CreateOrderDtoSchema), this.createOrder.bind(this));
         this.router.get("/all", this.getAll.bind(this));
-        this.router.get("/cancel/:orderId", zValidator("param", IdSchema), this.cancelOrder.bind(this));
-        this.router.get("/complete/:orderId", zValidator("param", IdSchema), this.completeOrder.bind(this));
+        this.router.path("/cancel/:orderId", zValidator("param", IdSchema), this.cancelOrder.bind(this));
+        this.router.path("/complete/:orderId", zValidator("param", IdSchema), this.completeOrder.bind(this));
         this.router.get("/get/:orderId", zValidator("param", IdSchema), this.getById.bind(this));
     }
 
