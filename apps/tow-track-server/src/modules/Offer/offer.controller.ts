@@ -2,6 +2,7 @@ import { Context, Hono } from "hono";
 import { zValidator } from '@hono/zod-validator'
 import { CreateOfferDtoSchema, IOfferService } from ".";
 import { ICustomResponse } from "@utils";
+import { IdSchema } from "@dto";
 
 export interface IOfferController {
     router: Hono;
@@ -18,9 +19,9 @@ export class OfferController {
     }
 
     private routers() {
-        this.router.patch("/accept/:offerId", this.acceptOfferThenOrder.bind(this));
+        this.router.patch("/accept/:offerId", zValidator("param", IdSchema), this.acceptOfferThenOrder.bind(this));
         this.router.post("/create", zValidator("json", CreateOfferDtoSchema), this.createOffer.bind(this));
-        this.router.get("/all/:orderId", this.getOffersByOrderId.bind(this));
+        this.router.get("/all/:orderId", zValidator("param", IdSchema),  this.getOffersByOrderId.bind(this));
     }
 
     async acceptOfferThenOrder(c: Context) {

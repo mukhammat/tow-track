@@ -1,6 +1,8 @@
 import { Hono, Context } from "hono";
 import { ChatService } from ".";
 import { CustomResponse } from "@utils";
+import { zValidator } from "@hono/zod-validator";
+import { IdSchema } from "@dto";
 
 export class ChatController {
     public readonly router: Hono;
@@ -15,7 +17,7 @@ export class ChatController {
 
     private routers() {
         this.router.post("/send", this.sendMessage.bind(this));
-        this.router.get("/all/:chatId", this.getMessages.bind(this));
+        this.router.get("/all/:chatId", zValidator("param", IdSchema), this.getMessages.bind(this));
     }
 
     private async sendMessage(c: Context) {
