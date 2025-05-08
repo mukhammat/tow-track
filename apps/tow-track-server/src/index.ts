@@ -23,6 +23,7 @@ app.route("/api", router);
  * /api/offers/accept/:offerId      patch
  * /api/offers/create               post
  * /api/offers/all/:orderId         post
+ * /api/offers/cancel/:offerId      patch
  */
 
 /**
