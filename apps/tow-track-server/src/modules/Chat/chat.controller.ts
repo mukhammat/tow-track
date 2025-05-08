@@ -27,7 +27,13 @@ export class ChatController {
             return c.json({"message": "chatId is unvalid!" }, 401);
         }
 
-        const result = await this.chatService.sendMessage(c.env.DB, {chat_id: chatId, message, is_client: isClient });
+        const result = await this.chatService.sendMessage(
+            c.env.DB,
+            {
+                chat_id: chatId,
+                message,
+                is_client: isClient 
+            });
 
         return c.json(...this.customResponse.success({data: {
             result,
