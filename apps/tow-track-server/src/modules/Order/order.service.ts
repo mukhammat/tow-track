@@ -23,14 +23,13 @@ export class OrderService implements IOrderService {
 
     public async assignPartnerToOrder(d1: D1Database, order_id: number, partner_id: number) {
         console.log("Assign partner to order...");
-        const db = drizzleClient(d1);
         const order = await this.getById(d1, order_id);
     
         if (!["negotiating", "searching"].includes(order.status)) {
             throw new NotAvailableException({entity: "Order", id: order.id});
         }
     
-        const partnerOrders = await this.getManyByPartnerId(db, partner_id);
+        const partnerOrders = await this.getManyByPartnerId(d1, partner_id);
     
         const busyOrder = partnerOrders.find(
             (o) => o.status === "waiting" || o.status === "loading"
@@ -40,7 +39,7 @@ export class OrderService implements IOrderService {
             throw new NotAvailableException({ message: `Partner with id ${partner_id} already has active order` });
         }
     
-        const updatedOrder = await this.updateOrder(db, order_id, { partner_id, status: "negotiating" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { partner_id, status: "negotiating" });
     
         return updatedOrder;
     }
@@ -73,7 +72,8 @@ export class OrderService implements IOrderService {
         return order;
     }
     
-    private async getManyByPartnerId(db: ReturnType<typeof drizzleClient>, partner_id: number) {
+    private async getManyByPartnerId(d1: D1Database, partner_id: number) {
+        const db = drizzleClient(d1);
         const results = await db.query.orders.findMany({
             where: eq(orders.partner_id, partner_id),
         });
@@ -85,9 +85,9 @@ export class OrderService implements IOrderService {
         return results;
     }
 
-    private async updateOrder(db:  ReturnType<typeof drizzleClient>, order_id: number, data: unknown) {
+    private async updateOrder(d1: D1Database, order_id: number, data: unknown) {
         console.log("Update order...");
-
+        const db = drizzleClient(d1);
         const order = await db
         .update(orders)
         .set(data)
@@ -98,7 +98,6 @@ export class OrderService implements IOrderService {
 
     public async cancelOrder(d1: D1Database, order_id: number) {
         console.log("Cancel order...");
-        const db = drizzleClient(d1);
         const order = await this.getById(d1, order_id);
     
         if (order.status === "canceled") {
@@ -109,14 +108,13 @@ export class OrderService implements IOrderService {
             throw new NotAvailableException({entity: "Order", id: order.id});
         }
     
-        const updatedOrder = await this.updateOrder(db, order_id, { status: "canceled" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { status: "canceled" });
     
         return updatedOrder.id;
     }
 
     public async completeOrder(d1: D1Database, order_id: number) {
         console.log("Complete order...");
-        const db = drizzleClient(d1);
         const order = await this.getById(d1, order_id);
     
         if (order.status === "delivered") {
@@ -128,7 +126,7 @@ export class OrderService implements IOrderService {
             throw new NotAvailableException({entity: "Order", id: order.id});
         }
     
-        const updatedOrder = await this.updateOrder(db, order_id, { status: "delivered" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { status: "delivered" });
     
         return updatedOrder.id;
     }
