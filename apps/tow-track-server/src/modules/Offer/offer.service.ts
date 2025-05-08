@@ -95,7 +95,6 @@ export class OfferService implements IOfferService {
   }
 
   public async cancelOffer(d1: D1Database, offerId: number) {
-    const db = drizzleClient(d1);
     const offer = await this.updateOfferStatus(d1, offerId, "rejected");
     return offer;
   }
