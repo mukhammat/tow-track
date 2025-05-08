@@ -1,11 +1,3 @@
-type CreateMessageDto = {
-      chat_id: number,
-      message: string,
-      is_client: boolean,
-}
-
-type UpdateMessageDto = Partial<CreateMessageDto>;
-
 type GetMesssageType = {
     id: number;
     chat_id: number;
@@ -13,3 +5,7 @@ type GetMesssageType = {
     is_client: number;
     sent_at: string;
 }
+
+type CreateMessageDto = Omit<GetMesssageType, "id" | "sent_at">;
+
+type UpdateMessageDto = Partial<CreateMessageDto>;

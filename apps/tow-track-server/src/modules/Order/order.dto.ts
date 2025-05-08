@@ -1,15 +1,5 @@
 export type OrderStatus = 'searching' | 'negotiating' | 'waiting' | 'loading' | 'delivered' | 'canceled'
 
-export type CreateOrderDto = {
-  from: string;
-  to: string;
-  intercity?: 0 | 1;
-  location_url?: string;
-  phone: string;
-  client_telegram_id: number;
-  vehicle_info: string;
-};
-
 export type GetOrderDto =  {
   id: number;
   phone: string;
@@ -25,6 +15,8 @@ export type GetOrderDto =  {
   status: OrderStatus;
   updated_at: string;
 }
+
+export type CreateOrderDto = Omit<GetOrderDto, "id" | "created_at" | "partner_id" | "price" | "status" | "updated_at">
 
 
 import { z } from 'zod';

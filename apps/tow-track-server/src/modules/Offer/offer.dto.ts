@@ -9,12 +9,7 @@ export type GetOfferDto = {
     order_id: number;
 }
 
-export type CreateOfferDto = {
-    order_id: number;
-    partner_id: number;
-    price: number;
-    status: OfferStatus;
-};
+export type CreateOfferDto = Omit<GetOfferDto, "id" | "created_at">
 
 export type UpdateOfferDto = Partial<CreateOfferDto>;
 
