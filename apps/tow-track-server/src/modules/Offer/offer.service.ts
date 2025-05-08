@@ -9,6 +9,7 @@ export interface IOfferService {
   getAll(d1: D1Database): Promise<GetOfferDto[]>;
   acceptOffer( d1: D1Database, offerId: number): Promise<GetOfferDto>;
   getPendingOffersByOrderId(d1: D1Database, orderId: number): Promise<GetOfferDto[]>;
+  cancelOffer(d1: D1Database, offerId: number): Promise<GetOfferDto>;
 }
 
 export class OfferService implements IOfferService {
@@ -91,5 +92,11 @@ export class OfferService implements IOfferService {
       }
 
       return offersByOrderId;
+  }
+
+  public async cancelOffer(d1: D1Database, offerId: number) {
+    const db = drizzleClient(d1);
+    const offer = await this.updateOfferStatus(d1, offerId, "rejected");
+    return offer;
   }
 }

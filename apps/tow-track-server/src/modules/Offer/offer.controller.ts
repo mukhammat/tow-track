@@ -22,9 +22,10 @@ export class OfferController {
         this.router.patch("/accept/:offerId", zValidator("param", IdSchema), this.acceptOfferThenOrder.bind(this));
         this.router.post("/create", zValidator("json", CreateOfferDtoSchema), this.createOffer.bind(this));
         this.router.get("/all/:orderId", zValidator("param", IdSchema),  this.getOffersByOrderId.bind(this));
+        this.router.patch("/cancel/:offerId", zValidator("param", IdSchema), this.cancelOffer.bind(this));
     }
 
-    async acceptOfferThenOrder(c: Context) {
+    private async acceptOfferThenOrder(c: Context) {
         const { offerId } = c.req.param();
 
         if(isNaN(Number(offerId))) {
@@ -38,7 +39,7 @@ export class OfferController {
         return c.json(...this.customResponse.success({ message: "Offer then order accepted!" }));
     } 
 
-    async createOffer(c: Context) {
+    private async createOffer(c: Context) {
         const data = await c.req.json();
 
         const offerId = await this.offerService.createOffer(c.env.DB, data);
@@ -46,14 +47,19 @@ export class OfferController {
         return c.json(...this.customResponse.success({ message: "Offer created!", status: 201, data: { offerId } }));
     }
 
-    async getOffersByOrderId(c: Context) {
+    private async getOffersByOrderId(c: Context) {
         const { orderId } = c.req.param();
 
-        if(isNaN(Number(orderId))) {
-            return c.json({"message": "orderId is unvalid!" }, 401);
-        }
-        const data = await this.offerService.getPendingOffersByOrderId(c.env.DB, Number(orderId));
+        const offers = await this.offerService.getPendingOffersByOrderId(c.env.DB, Number(orderId));
 
-        return c.json(...this.customResponse.success({ data, status: 200 }));
+        return c.json(...this.customResponse.success({ data: { offers } }));
+    }
+
+    private async cancelOffer(c: Context) {
+        const { offerId } = c.req.param();
+
+        const offer = await this.offerService.cancelOffer(c.env.DB, Number(offerId));
+
+        return c.json(...this.customResponse.success({data: { offerId: offer.id }}));
     }
 }
