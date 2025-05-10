@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { drizzleClient, orders, partners } from "@db"
-import { CreateOrderDto, GetOrderDto, OrderStatus } from "."
+import { drizzleClient, orders } from "@db"
 import { NotFoundException, NotAvailableException } from "@exceptions";
+import { CreateOrderDto, GetOrderDto } from "."
 
 export interface IOrderService {
     createOrder(client: D1Database, data: CreateOrderDto): Promise<number>;
@@ -10,6 +10,24 @@ export interface IOrderService {
     completeOrder(d1: D1Database, order_id: number): Promise<number>;
     getById(d1: D1Database, order_id: number): Promise<GetOrderDto>;
 }
+
+const {
+    ORDER,
+    SEARCH,
+    NEGOTIAT,
+    WAIT,
+    LOAD,
+    DELIVER,
+    CANCEL
+} = {
+    ORDER: "Order",
+    SEARCH: "searching",
+    NEGOTIAT: "negotiating",
+    WAIT: "waiting",
+    LOAD: "loading",
+    DELIVER: "delivered",
+    CANCEL: "canceled",
+};
 
 export class OrderService implements IOrderService {
     constructor() {
@@ -25,21 +43,21 @@ export class OrderService implements IOrderService {
         console.log("Assign partner to order...");
         const order = await this.getById(d1, order_id);
     
-        if (!["negotiating", "searching"].includes(order.status)) {
-            throw new NotAvailableException({entity: "Order", id: order.id});
+        if (![NEGOTIAT, SEARCH].includes(order.status)) {
+            throw new NotAvailableException({entity: ORDER, id: order.id});
         }
     
         const partnerOrders = await this.getManyByPartnerId(d1, partner_id);
     
         const busyOrder = partnerOrders.find(
-            (o) => o.status === "waiting" || o.status === "loading"
+            (o) => o.status === WAIT || o.status === LOAD
         );
     
         if (busyOrder) {
             throw new NotAvailableException({ message: `Partner with id ${partner_id} already has active order` });
         }
     
-        const updatedOrder = await this.updateOrder(d1, order_id, { partner_id, status: "negotiating" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { partner_id, status: NEGOTIAT });
     
         return updatedOrder;
     }
@@ -52,7 +70,7 @@ export class OrderService implements IOrderService {
         });
 
         if (!order.length) {
-            throw new NotFoundException("Order");
+            throw new NotFoundException(ORDER);
         }
 
         return order;
@@ -66,7 +84,7 @@ export class OrderService implements IOrderService {
         });
     
         if (!order) {
-            throw new NotFoundException("Order");
+            throw new NotFoundException(ORDER);
         }
     
         return order;
@@ -79,7 +97,7 @@ export class OrderService implements IOrderService {
         });
 
         if (!results.length) {
-            throw new NotFoundException("Order");
+            throw new NotFoundException(ORDER);
         }
 
         return results;
@@ -100,15 +118,15 @@ export class OrderService implements IOrderService {
         console.log("Cancel order...");
         const order = await this.getById(d1, order_id);
     
-        if (order.status === "canceled") {
-            throw new NotAvailableException({entity: "Order", id: order.id});
+        if (order.status === CANCEL) {
+            throw new NotAvailableException({entity: ORDER, id: order.id});
         }
 
-        if(["delivered", "waiting", "loading", "canceled"].includes(order.status)) {
-            throw new NotAvailableException({entity: "Order", id: order.id});
+        if([DELIVER, WAIT, LOAD, CANCEL].includes(order.status)) {
+            throw new NotAvailableException({entity: ORDER, id: order.id});
         }
     
-        const updatedOrder = await this.updateOrder(d1, order_id, { status: "canceled" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { status: CANCEL });
     
         return updatedOrder.id;
     }
@@ -117,16 +135,16 @@ export class OrderService implements IOrderService {
         console.log("Complete order...");
         const order = await this.getById(d1, order_id);
     
-        if (order.status === "delivered") {
-            throw new NotAvailableException({entity: "Order", id: order.id});
+        if (order.status === DELIVER) {
+            throw new NotAvailableException({entity: ORDER, id: order.id});
         }
 
             
-        if (["searching", "negotiating", "canceled", "delivered"].includes(order.status)) {
-            throw new NotAvailableException({entity: "Order", id: order.id});
+        if ([SEARCH, NEGOTIAT, CANCEL, DELIVER].includes(order.status)) {
+            throw new NotAvailableException({entity: ORDER, id: order.id});
         }
     
-        const updatedOrder = await this.updateOrder(d1, order_id, { status: "delivered" });
+        const updatedOrder = await this.updateOrder(d1, order_id, { status: DELIVER });
     
         return updatedOrder.id;
     }
