@@ -9,6 +9,7 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
+		"grammy": "^1.36.1",
 		"hono": "^4.4.7",
 		"telegraf": "^4.16.3",
 		"zod": "^3.23.8"

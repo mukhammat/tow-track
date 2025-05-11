@@ -1,10 +1,13 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import router from "./routers"
 import { HTTPException } from "hono/http-exception";
 
 // Start a Hono app
 const app = new Hono();
 
+app.use(async (c: Context) => {
+    global.db = c.env.DB
+});
 app.route("/api", router);
 /**
  * /api/orders/create               post

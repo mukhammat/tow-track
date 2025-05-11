@@ -1,0 +1,41 @@
+{
+    "name": "tow-track-telegram-bot-v2",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "nodemon --watch ts-node -r tsconfig-paths/register src/index.ts",
+        "start": "node -r tsconfig-paths/register dist/index.js",
+        "build": "tsc -p . && tsc-alias"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@fastify/cors": "^11.0.1",
+        "bcrypt": "^5.1.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "drizzle-orm": "^0.43.1",
+        "express": "^5.1.0",
+        "fastify": "^5.3.2",
+        "jsonwebtoken": "^9.0.2",
+        "pg": "^8.15.6",
+        "tsconfig-paths": "^4.2.0",
+        "zod": "^3.24.2"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
+        "@types/cors": "^2.8.18",
+        "@types/express": "^5.0.1",
+        "@types/jsonwebtoken": "^9.0.7",
+        "@types/node": "^22.10.6",
+        "@types/pg": "^8.15.1",
+        "drizzle-kit": "^0.31.1",
+        "nodemon": "^3.1.9",
+        "ts-node": "^10.9.2",
+        "tsc-alias": "^1.8.15",
+        "typescript": "^5.7.3"
+    }
+}

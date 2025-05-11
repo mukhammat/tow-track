@@ -7,3 +7,8 @@ export const drizzleClient = (db: D1Database) => {
     schema
   });
 };
+
+const globalDb = globalThis.db as D1Database | undefined;
+export const db = () => {
+  return drizzle(globalDb, {schema});
+}

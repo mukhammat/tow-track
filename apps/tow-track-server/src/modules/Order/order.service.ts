@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { drizzleClient, orders } from "@db"
+import { drizzleClient, orders, db } from "@db"
 import { NotFoundException, NotAvailableException } from "@exceptions";
 import { CreateOrderDto, GetOrderDto } from "."
 
