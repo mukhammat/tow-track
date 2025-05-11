@@ -1,5 +1,5 @@
 {
-    "name": "tow-track-telegram-bot-v2",
+    "name": "@tow-track/fastify",
     "version": "1.0.0",
     "main": "dist/index.js",
     "scripts": {
