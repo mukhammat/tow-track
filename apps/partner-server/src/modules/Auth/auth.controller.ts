@@ -15,13 +15,14 @@ export class AuthController {
     this.router();
   }
 
-  private async router() {
+  private router() {
     this.fastify.post<{ Body: LoginBody }>('/login',{
+    }, this.login.bind(this));
+    this.fastify.post<{ Body: RegisterDto }>('/register', {
       schema: {
         body: RegisterDtoSchema
       }
-    }, this.login.bind(this));
-    this.fastify.post<{ Body: RegisterDto }>('/register', this.register.bind(this));
+    }, this.register.bind(this));
   }
 
   private async login(
@@ -67,6 +68,7 @@ export class AuthController {
         .status(409)
         .send({ success: false, message: 'User already exists' })
     }
+
     const token = this.fastify.jwt.sign({ telegram_id: data.telegram_id }, { expiresIn: '24h' })
     reply.setCookie('token', token, {
       httpOnly: true,

@@ -7,14 +7,15 @@ export type RegisterDto = {
       vehicle_info: string,
 }
 
-import { z } from 'zod';
+import { Type } from '@sinclair/typebox';
 
-export const RegisterDtoSchema = z.object({
-      first_name: z.string().min(1, 'first_name is required'),
-      last_name: z.string().min(1, 'last_name is required'),
-      iin: z.string().min(10, 'iin is required'),
-      phone:  z.string().min(10, 'phone is required'),
-      telegram_id: z.number(),
-      vehicle_info: z.string().min(1, "vehicle_info is required")
-      .max(255, 'vehicle_info can\'t be more then 255 chars ')
-}).strict();
+export const RegisterDtoSchema = Type.Object({
+  first_name: Type.String({ minLength: 1 }),
+  last_name: Type.String({ minLength: 1 }),
+  iin: Type.String({ minLength: 10 }),
+  phone: Type.String({ minLength: 10 }),
+  telegram_id: Type.Number(),
+  vehicle_info: Type.String({ minLength: 1, maxLength: 255 })
+}, {
+  additionalProperties: false
+});

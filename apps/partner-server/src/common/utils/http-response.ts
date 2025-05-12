@@ -4,6 +4,12 @@ type SuccessResponseType = [{
     data: unknown;
 }, status: number ];
 
+type ErrorResponseType = [{
+    success: false;
+    message: string;
+    code?: string | null;
+}, status: number ];
+
 type ResponseDto = {
     data?: unknown;
     message?: string,
@@ -14,7 +20,6 @@ export interface IHttpResponse {
     success(data: ResponseDto): SuccessResponseType;
 }
 
-// Нужно доработать
 export class HttpResponse implements IHttpResponse {
     constructor() {
     }
@@ -27,12 +32,11 @@ export class HttpResponse implements IHttpResponse {
         }, status];
     }
 
-    // On develompment
-    private error(message = "Something went wrong", status = 500) {
-        return {
-            status,
+    public error({message = "Internal Server Error", status = 500, code = null}):ErrorResponseType {
+        return [{
             success: false,
             message,
-        }
+            code,
+        }, status]
     }
 }

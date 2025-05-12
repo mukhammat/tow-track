@@ -17,7 +17,7 @@ export class AuthService implements IAuthService {
             where: eq(partners.telegram_id, telegram_id)
         });
         if(!partner) {
-            throw Error("Not found");
+            throw Error("Not found!");
         }
         return partner.telegram_id;
     }
