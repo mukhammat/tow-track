@@ -1,14 +1,14 @@
-type SuccessResponseType = [{
+type SuccessResponseType = {
     success: true;
     message: string;
     data: unknown;
-}, status: number ];
+};
 
-type ErrorResponseType = [{
+type ErrorResponseType = {
     success: false;
     message: string;
     code?: string | null;
-}, status: number ];
+};
 
 type ResponseDto = {
     data?: unknown;
@@ -24,20 +24,20 @@ export class HttpResponse implements IHttpResponse {
     constructor() {
     }
 
-    public success({ data = null, message = "Success", status = 200 }: ResponseDto): SuccessResponseType {
-        return [{
+    public success({ data = null, message = "Success" }: ResponseDto): SuccessResponseType {
+        return {
             success: true,
             message,
             data,
-        }, status];
+        };
     }
 
-    public error({message = "Internal Server Error", status = 500, code = null}):ErrorResponseType {
-        return [{
+    public error({message = "Internal Server Error", code = null}):ErrorResponseType {
+        return {
             success: false,
             message,
             code,
-        }, status]
+        }
     }
 }
 

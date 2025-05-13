@@ -44,12 +44,7 @@ export class AuthController {
       maxAge: 60 * 60 * 24
     });
 
-    const [payload, status] = httpResponse.success({
-        data: {
-            token
-        }
-    })
-    return reply.status(status).send(payload)
+    return reply.status(200).send(httpResponse.success({data: { token }}));
   }
 
   private async register(
@@ -72,10 +67,6 @@ export class AuthController {
       maxAge: 60 * 60 * 24
     })
 
-    const  [payload, status] = httpResponse.success({
-        status: 201,
-        data: token
-    })
-    return reply.status(status).send(payload)
+    return reply.status(201).send(httpResponse.success({data: { token }}))
   }
 }

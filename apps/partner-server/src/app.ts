@@ -8,7 +8,7 @@ import { HttpResponse } from "@utils";
 const httpResponse = new HttpResponse
 
 // Импорт роутеров
-import plugins from "./plugins";
+import routers from "./routers";
 
 const app = fastify({ logger: true });
 
@@ -29,10 +29,10 @@ app.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply
 });
 
 // Регистрация API роутов
-app.register(plugins, { prefix: '/api' });
+app.register(routers, { prefix: '/api' });
 
 // Корневой маршрут
-app.get('/health', async (_request, _reply) => {
+app.get('/health', async (_request, reply) => {
   return { status: "ok" };
 });
 
@@ -40,13 +40,11 @@ app.setErrorHandler((err, req, reply) => {
   if (err.validation) {
     return reply.status(400).send({ success: false, errors: err.validation });
   }
-  const [payload, status] = httpResponse.error({});
-  reply.status(status).send(payload);
+  reply.status(500).send(httpResponse.error({}));
 });
 
 app.setNotFoundHandler((_request, reply) => {
-  const [payload, status] = httpResponse.error({status: 404, message: "Not found!"});
-  reply.status(status).send(payload);
+  reply.status(404).send(httpResponse.error({message: "Not found!"}));
 });
 
 export default app;
