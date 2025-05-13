@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { IAuthService, RegisterDto, RegisterDtoSchema } from '.'
-import { IHttpResponse } from '@utils'
+import { httpResponse } from '@utils'
 
 interface LoginBody {
   telegram_id: number
@@ -10,12 +10,11 @@ export class AuthController {
   constructor(
     private fastify: FastifyInstance,
     private authService: IAuthService,
-    private httpResponse: IHttpResponse
   ) {
-    this.router();
+    this.routers();
   }
 
-  private router() {
+  private routers() {
     this.fastify.post<{ Body: LoginBody }>('/login',{
     }, this.login.bind(this));
     this.fastify.post<{ Body: RegisterDto }>('/register', {
@@ -23,7 +22,7 @@ export class AuthController {
         body: RegisterDtoSchema
       }
     }, this.register.bind(this));
-  }
+  };
 
   private async login(
     request: FastifyRequest<{ Body: LoginBody }>,
@@ -49,7 +48,7 @@ export class AuthController {
       maxAge: 60 * 60 * 24
     })
 
-    const [payload, status] = this.httpResponse.success({
+    const [payload, status] = httpResponse.success({
         data: {
             token
         }
@@ -78,7 +77,7 @@ export class AuthController {
       maxAge: 60 * 60 * 24
     })
 
-    const  [payload, status] = this.httpResponse.success({
+    const  [payload, status] = httpResponse.success({
         status: 201,
         data: token
     })

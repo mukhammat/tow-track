@@ -40,3 +40,5 @@ export class HttpResponse implements IHttpResponse {
         }, status]
     }
 }
+
+export const httpResponse = new HttpResponse();
