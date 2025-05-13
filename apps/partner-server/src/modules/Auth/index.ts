@@ -4,9 +4,8 @@ export * from "./auth.controller"
 
 import { FastifyPluginAsync } from 'fastify'
 import { AuthController, AuthService } from '.'
-import { db } from '@db'
 
 export const authPlugin: FastifyPluginAsync = async (fastify) => {
-  const service = new AuthService(db, fastify.jwt);
+  const service = new AuthService(fastify.db, fastify.jwt);
   new AuthController(fastify, service)
 }

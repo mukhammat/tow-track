@@ -1,4 +1,4 @@
-import { DrizzleClient, partners } from "@db";
+import { DrizzleClient, partners } from "@src/common/db";
 import { RegisterDto } from "."
 import { eq } from "drizzle-orm";
 import { JWT } from "@fastify/jwt";

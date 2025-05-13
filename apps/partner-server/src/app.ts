@@ -4,8 +4,9 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from "@fastify/cookie"
 import {FastifyReply, FastifyRequest } from "fastify";
 import { config } from "dotenv"; config();
-import { HttpResponse } from "@utils";
-const httpResponse = new HttpResponse
+import { httpResponse } from "@utils";
+import drizzlePlugin from "@db";
+
 
 // Импорт роутеров
 import routers from "./routers";
@@ -19,6 +20,10 @@ app.register(fastifyCookie, {
 });
 app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || 'super-secret-key',
+});
+  
+app.register(drizzlePlugin, {
+  connectionString: process.env.DATABASE_URL,
 });
 app.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
   try {
