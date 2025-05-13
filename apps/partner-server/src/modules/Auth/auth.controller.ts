@@ -29,16 +29,12 @@ export class AuthController {
     reply: FastifyReply
   ) {
     const { telegram_id } = request.body;
-    const auth = await this.authService.login(telegram_id);
-    if (!auth) {
+    const token = await this.authService.login(telegram_id);
+    if (!token) {
       return reply
         .status(404)
         .send({ success: false, message: 'User not found' })
     }
-
-    const token = this.fastify.jwt.sign({ telegram_id: auth }, {
-      expiresIn: '24h'
-    })
 
     reply.setCookie('token', token, {
       httpOnly: true,
@@ -46,7 +42,7 @@ export class AuthController {
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24
-    })
+    });
 
     const [payload, status] = httpResponse.success({
         data: {
@@ -61,14 +57,13 @@ export class AuthController {
     reply: FastifyReply
   ) {
     const data = request.body
-    const result = await this.authService.register(data)
-    if (!result) {
+    const token = await this.authService.register(data)
+    if (!token) {
       return reply
         .status(409)
         .send({ success: false, message: 'User already exists' })
     }
 
-    const token = this.fastify.jwt.sign({ telegram_id: data.telegram_id }, { expiresIn: '24h' })
     reply.setCookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

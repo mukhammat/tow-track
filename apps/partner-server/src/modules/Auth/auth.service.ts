@@ -1,15 +1,17 @@
 import { DrizzleClient, partners } from "@db";
 import { RegisterDto } from "."
 import { eq } from "drizzle-orm";
+import { JWT } from "@fastify/jwt";
 
 export interface IAuthService {
-    login(telegram_id: number): Promise<number>
-    register(data: RegisterDto): Promise<number>
+    login(telegram_id: number): Promise<string>
+    register(data: RegisterDto): Promise<string>
 }
 
 export class AuthService implements IAuthService {
     constructor(
-        private db: DrizzleClient
+        private db: DrizzleClient,
+        private jwt: JWT
     ) {}
 
     async login(telegram_id: number) {
@@ -19,12 +21,16 @@ export class AuthService implements IAuthService {
         if(!partner) {
             throw Error("Not found!");
         }
-        return partner.telegram_id;
+
+        const token = this.jwt.sign({ telegram_id: partner.telegram_id }, {
+            expiresIn: '24h'
+        })
+        return token;
     }
 
     async register(data: RegisterDto) {
-        const partner = await this.db.insert(partners).values(data);
-        
-        return data.telegram_id;
+        const partner = await this.db.insert(partners).values(data).returning({ telegram_id: partners.telegram_id });
+        const token = this.jwt.sign({ telegram_id: partner[0].telegram_id }, { expiresIn: '24h' })
+        return token;
     }
 }
